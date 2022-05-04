@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  tiny:
+    restart: always
+    container_name: 'app-tiny'
+    build: .
+    command: bash -c "rm -rf celerybeat.pid && python /code/manage.py migrate --noinput && /usr/bin/supervisord"
+    volumes:
+      - .:/code
+
+    environment:
+      - WEBPORT=${WEBPORT}
+    ports:
+      - "${WEBPORT}:${WEBPORT}"
