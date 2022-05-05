@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from core.models import Configuration, Order
+from core.models import Configuration, Order, OrderItems
 from core.tasks import task_search_expedition, task_sync_orders, task_update_order
 
 
@@ -71,3 +71,8 @@ class OrderAdmin(admin.ModelAdmin):
             )
 
     handle_get_update_orders.short_description = 'Atualizar pedidos'
+
+
+@admin.register(OrderItems)
+class OrderItemAdmin(admin.ModelAdmin):
+    pass
