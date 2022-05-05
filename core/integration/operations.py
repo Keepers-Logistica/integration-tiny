@@ -4,7 +4,7 @@ from io import BytesIO
 from typing import List
 from urllib.parse import urljoin
 from urllib.request import urlopen
-from zipfile import ZipFile
+from zipfile import BadZipfile, ZipFile
 
 import requests
 import xmltodict
@@ -181,22 +181,28 @@ class SaveLabelOrder(BaseOperation):
             idAgrupamento=self.__order.group_expedition_id
         )
 
+    def generate_file(self, content):
+        self.__order.label.save(
+            os.path.join(
+                self.__order.configuration.name,
+                f'{self.__order.number}.zpl'
+            ),
+            ContentFile(content)
+        )
+
     def save(self, serializer: ResponseSerializer):
         logger.info(f'Create xml file by order {self.__order}')
 
         for label in serializer.labels:
             resp = urlopen(label)
-            with ZipFile(BytesIO(resp.read())) as zipfile:
-                for filename in zipfile.namelist():
-                    self.__order.label.save(
-                        os.path.join(
-                            self.__order.configuration.name,
-                            f'{self.__order.number}.zpl'
-                        ),
-                        ContentFile(
+            try:
+                with ZipFile(BytesIO(resp.read())) as zipfile:
+                    for filename in zipfile.namelist():
+                        self.generate_file(
                             zipfile.read(filename).decode()
                         )
-                    )
+            except BadZipfile:
+                self.generate_file(resp.read())
 
 
 class SaveExpeditionInfo(BaseOperation):
@@ -322,8 +328,12 @@ class UpdateOrder(BaseOperation):
         super().__init__(configuration)
 
     def save_items(self, order: Order, items: List[OrderItemData]):
+        logger.info(items)
         bulk_items = [
-            OrderItems(idseq=idseq, order=order, **item.to_dict())
+            OrderItems(
+                idseq=idseq,
+                order=order, **item.to_dict()
+            )
             for idseq, item in enumerate(items, start=1)
         ]
         OrderItems.objects.bulk_create(bulk_items)
