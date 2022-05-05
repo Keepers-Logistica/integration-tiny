@@ -1,12 +1,19 @@
-from core.integration.operations import (
-    OperationError,
-    SaveExpeditionInfo,
-    SaveOrders,
-    UpdateOrder
-)
+from core.integration.operations import (OperationError, SaveExpeditionInfo, SaveOrders, SendRequestToIntegrator,
+                                         UpdateOrder)
 from core.models import Configuration
 from core.models import Order
 from integration_tiny.celery import app
+
+
+@app.task(rate_limit='10/m')
+def task_send_order_to_integrador(order_id):
+    order = Order.objects.get(
+        id=order_id
+    )
+
+    SendRequestToIntegrator(
+        order,
+    ).execute()
 
 
 @app.task(rate_limit='10/m')
