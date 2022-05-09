@@ -399,9 +399,12 @@ class SaveOrders(BaseOperation):
         self.params.update(
             dataInicialOcorrencia=before,
             dataFinalOcorrencia=now,
-            situacao=self.configuration.status,
             sort="DESC"
         )
+        if self.configuration.status:
+            self.params.update(
+                situacao=self.configuration.status
+            )
 
     def save(self, serializer: ResponseSerializer):
         logger.info('Starting an order sync...')

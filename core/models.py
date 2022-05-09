@@ -36,7 +36,12 @@ class Configuration(models.Model):
     name = models.CharField(max_length=50)
     token_integrator = models.CharField(max_length=200)
     token = models.CharField(max_length=200)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICE)
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICE,
+        null=True,
+        blank=True
+    )
     days = models.IntegerField(default=0)
     search_labels = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
