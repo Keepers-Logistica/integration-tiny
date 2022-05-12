@@ -329,6 +329,9 @@ class UpdateOrder(BaseOperation):
 
     def save_items(self, order: Order, items: List[OrderItemData]):
         logger.info(items)
+
+        order.items.all().delete()
+
         bulk_items = [
             OrderItems(
                 idseq=idseq,
