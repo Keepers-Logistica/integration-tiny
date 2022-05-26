@@ -2,6 +2,7 @@ import os
 
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
 from core.managers import OrderManager
@@ -202,3 +203,16 @@ class OrderItems(models.Model):
 
     def __str__(self):
         return f"{self.order} - {self.product}"
+
+
+def delete_file(file):
+    if not file:
+        return
+    if os.path.isfile(file.path):
+        os.remove(file.path)
+
+
+@receiver(models.signals.post_delete, sender=Order)
+def auto_delete_file_on_delete(sender, instance: Order, **kwargs):
+    delete_file(instance.xml)
+    delete_file(instance.label)

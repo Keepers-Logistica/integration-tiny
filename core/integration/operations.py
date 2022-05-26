@@ -167,6 +167,40 @@ class SendRequestToIntegrator:
         ).execute()
 
 
+class SendRequestLabelToIntegrator:
+    def __init__(self, order: Order):
+        self.__order = order
+        self.__configuration = order.configuration
+
+    @property
+    def payload(self):
+        return [
+            ('attachment', self.__order.label.open('rb'))
+        ]
+
+    def send_request(self):
+        resource = urljoin(
+            BASE_URL_INTEGRATOR,
+            f'orders/{self.__order.integrator_id}/attachment'
+        )
+        headers = {
+            'Authorization': f'Token {self.__configuration.token_integrator}',
+        }
+        response = requests.post(
+            url=resource,
+            headers=headers,
+            files=self.payload
+        )
+
+        return response.content
+
+    def execute(self):
+        if not self.__order.integrator_id:
+            return
+
+        self.send_request()
+
+
 class SaveLabelOrder(BaseOperation):
     RESOURCE = 'expedicao.obter.etiquetas.impressao.php'
 
@@ -190,10 +224,8 @@ class SaveLabelOrder(BaseOperation):
             ContentFile(content)
         )
 
-    def save(self, serializer: ResponseSerializer):
-        logger.info(f'Create xml file by order {self.__order}')
-
-        for label in serializer.labels:
+    def save_label(self, labels):
+        for label in labels:
             resp = urlopen(label)
             try:
                 with ZipFile(BytesIO(resp.read())) as zipfile:
@@ -203,6 +235,15 @@ class SaveLabelOrder(BaseOperation):
                         )
             except BadZipfile:
                 self.generate_file(resp.read())
+
+    def save(self, serializer: ResponseSerializer):
+        logger.info(f'Create xml file by order {self.__order}')
+
+        self.save_label(serializer.labels)
+
+        SendRequestLabelToIntegrator(
+            self.__order
+        ).execute()
 
 
 class SaveExpeditionInfo(BaseOperation):
@@ -460,6 +501,9 @@ class SendRequestBillingToIntegrator:
         return response.content
 
     def execute(self):
+        if not self.__order.integrator_id:
+            return
+
         self.send_request()
 
         try:

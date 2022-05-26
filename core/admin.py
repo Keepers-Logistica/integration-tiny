@@ -1,7 +1,8 @@
+from django.contrib import admin
+
 from core.filters import OrderHasLabelFilter
 from core.models import Configuration, Order, OrderItems
 from core.tasks import task_search_expedition, task_send_order_to_integrador, task_sync_orders, task_update_order
-from django.contrib import admin
 
 
 @admin.register(Configuration)
@@ -34,7 +35,7 @@ class OrderAdmin(admin.ModelAdmin):
         'created_at'
     )
 
-    list_filter = ('status', 'created_at', 'sequence', OrderHasLabelFilter)
+    list_filter = ('status', 'created_at', 'sequence', OrderHasLabelFilter, 'running')
     actions = ('handle_get_expedition_info', 'handle_get_update_orders', 'handle_send_order_to_integrator')
     search_fields = ('number', 'number_store')
 

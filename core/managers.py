@@ -7,6 +7,7 @@ class OrderManager(Manager):
 
         queryset = queryset.filter(
             label__in=['', None],
+            status=self.model.IMPORTED,
             search_label=True,
             running=False
         )
@@ -17,6 +18,7 @@ class OrderManager(Manager):
         queryset = self.get_queryset()
 
         queryset = queryset.filter(
+            xml__in=['', None],
             status=self.model.AWAITING_FILES,
             running=False
         )
