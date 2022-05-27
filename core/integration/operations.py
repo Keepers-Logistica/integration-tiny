@@ -215,11 +215,13 @@ class SaveLabelOrder(BaseOperation):
             idAgrupamento=self.__order.group_expedition_id
         )
 
-    def generate_file(self, content):
+    def generate_file(self, content, filename):
+        _, extension = os.path.splitext(filename)
+
         self.__order.label.save(
             os.path.join(
                 self.__order.configuration.name,
-                f'{self.__order.number}.zpl'
+                f'{self.__order.number}{extension}'
             ),
             ContentFile(content)
         )
@@ -227,14 +229,17 @@ class SaveLabelOrder(BaseOperation):
     def save_label(self, labels):
         for label in labels:
             resp = urlopen(label)
+            content = resp.read()
             try:
-                with ZipFile(BytesIO(resp.read())) as zipfile:
+                with ZipFile(BytesIO(content)) as zipfile:
                     for filename in zipfile.namelist():
                         self.generate_file(
-                            zipfile.read(filename).decode()
+                            zipfile.read(filename).decode(),
+                            filename
                         )
             except BadZipfile:
-                self.generate_file(resp.read())
+                filename = str(label).split('/')[-1]
+                self.generate_file(content, filename)
 
     def save(self, serializer: ResponseSerializer):
         logger.info(f'Create xml file by order {self.__order}')
