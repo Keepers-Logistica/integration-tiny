@@ -543,3 +543,30 @@ class SendRequestBillingToIntegrator:
 
         except OperationError as error:
             logger.warning(f'[Save Expedition - {self.__order}] - {error}')
+
+
+class SendRequestCancelationToIntegrator:
+    def __init__(self, order: Order):
+        self.__order = order
+        self.__configuration = order.configuration
+
+    def send_request(self):
+        resource = urljoin(
+            BASE_URL_INTEGRATOR,
+            f'orders/{self.__order.integrator_id}/cancelation'
+        )
+        headers = {
+            'Authorization': f'Token {self.__configuration.token_integrator}',
+        }
+        response = requests.post(
+            url=resource,
+            headers=headers
+        )
+
+        return response.content
+
+    def execute(self):
+        if not self.__order.integrator_id:
+            return
+
+        self.send_request()

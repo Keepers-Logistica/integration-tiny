@@ -1,8 +1,7 @@
 from django.contrib import admin
 
 from core.filters import OrderHasLabelFilter
-from core.models import Configuration, Order, OrderItems
-from core.tasks import task_search_expedition, task_send_order_to_integrador, task_sync_orders, task_update_order
+from core.tasks import *
 
 
 @admin.register(Configuration)
@@ -36,7 +35,12 @@ class OrderAdmin(admin.ModelAdmin):
     )
 
     list_filter = ('configuration', 'status', 'created_at', 'sequence', OrderHasLabelFilter, 'running')
-    actions = ('handle_get_expedition_info', 'handle_get_update_orders', 'handle_send_order_to_integrator')
+    actions = (
+        'handle_get_expedition_info',
+        'handle_get_update_orders',
+        'handle_send_order_to_integrator',
+        'handle_send_cancelation_to_integrator'
+    )
     search_fields = ('number', 'number_store')
 
     def contains_xml(self, obj: Order):
@@ -87,6 +91,14 @@ class OrderAdmin(admin.ModelAdmin):
             )
 
     handle_send_order_to_integrator.short_description = 'Enviar pedido'
+
+    def handle_send_cancelation_to_integrator(self, request, queryset):
+        for order in queryset:
+            task_send_cancelation_to_integrador.delay(
+                order.id
+            )
+
+    handle_send_cancelation_to_integrator.short_description = 'Enviar solicitação de cancelamento'
 
 
 @admin.register(OrderItems)

@@ -85,6 +85,7 @@ class Order(models.Model):
     AWAITING_FILES = 0
     AWAITING_INTEGRATION = 1
     IMPORTED = 2
+    CANCELLED = 3
 
     STATUS_INVOICE = (
         (1, 'Pendente'),
@@ -104,7 +105,8 @@ class Order(models.Model):
     STATUS = (
         (AWAITING_FILES, 'Aguardando arquivos'),
         (AWAITING_INTEGRATION, 'Aguardando integração'),
-        (IMPORTED, 'Importado')
+        (IMPORTED, 'Importado'),
+        (CANCELLED, 'Cancelado'),
     )
 
     identifier = models.IntegerField()

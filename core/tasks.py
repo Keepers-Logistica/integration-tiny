@@ -1,9 +1,18 @@
-from core import logger
-from core.integration.operations import (OperationError, SaveExpeditionInfo, SaveOrders, SendRequestToIntegrator,
-                                         UpdateOrder)
+from core.integration.operations import *
 from core.models import Configuration
 from core.models import Order
 from integration_tiny.celery import app
+
+
+@app.task(rate_limit='4/m')
+def task_send_cancelation_to_integrador(order_id):
+    order = Order.objects.get(
+        id=order_id
+    )
+
+    SendRequestCancelationToIntegrator(
+        order,
+    ).execute()
 
 
 @app.task(rate_limit='4/m')
