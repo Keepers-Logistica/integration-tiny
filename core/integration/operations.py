@@ -570,3 +570,42 @@ class SendRequestCancelationToIntegrator:
             return
 
         self.send_request()
+
+
+class GetOrderInIntegrator:
+    def __init__(self, order: Order):
+        self.__order = order
+        self.__configuration = order.configuration
+
+    def send_request(self):
+        resource = urljoin(
+            BASE_URL_INTEGRATOR,
+            f'orders?order_number={self.__order.number}'
+        )
+        headers = {
+            'Authorization': f'Token {self.__configuration.token_integrator}',
+        }
+        response = requests.get(
+            url=resource,
+            headers=headers
+        )
+
+        if response and response.status_code == 200:
+            return response.json()
+
+        return None
+
+    def execute(self):
+        data = self.send_request()
+
+        if data:
+            results = data.get('results', [])
+
+            if not results:
+                self.__order.update_status(Order.CANCELLED)
+                return
+
+            self.__order.integrator_id = results[0]['id']
+            self.__order.save(
+                update_fields=['integrator_id']
+            )

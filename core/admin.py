@@ -39,7 +39,8 @@ class OrderAdmin(admin.ModelAdmin):
         'handle_get_expedition_info',
         'handle_get_update_orders',
         'handle_send_order_to_integrator',
-        'handle_send_cancelation_to_integrator'
+        'handle_send_cancelation_to_integrator',
+        'handle_get_order_in_integrator'
     )
     search_fields = ('number', 'number_store')
 
@@ -99,6 +100,14 @@ class OrderAdmin(admin.ModelAdmin):
             )
 
     handle_send_cancelation_to_integrator.short_description = 'Enviar solicitação de cancelamento'
+
+    def handle_get_order_in_integrator(self, request, queryset):
+        for order in queryset:
+            task_get_order_in_integrador.delay(
+                order.id
+            )
+
+    handle_get_order_in_integrator.short_description = 'Buscar pedido - Integrador'
 
 
 @admin.register(OrderItems)
