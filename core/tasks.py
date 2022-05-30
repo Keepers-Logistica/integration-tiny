@@ -4,7 +4,7 @@ from core.models import Order
 from integration_tiny.celery import app
 
 
-@app.task(rate_limit='4/m')
+@app.task(rate_limit='10/m')
 def task_send_cancelation_to_integrador(order_id):
     order = Order.objects.get(
         id=order_id
