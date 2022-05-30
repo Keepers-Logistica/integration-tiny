@@ -211,8 +211,7 @@ class SaveLabelOrder(BaseOperation):
 
     def update_params(self):
         self.params.update(
-            idExpedicao=self.__order.expedition_id,
-            idAgrupamento=self.__order.group_expedition_id
+            idExpedicao=self.__order.expedition_id
         )
 
     def generate_file(self, content, filename):
