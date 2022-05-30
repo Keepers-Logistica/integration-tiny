@@ -35,7 +35,7 @@ class OrderAdmin(admin.ModelAdmin):
         'created_at'
     )
 
-    list_filter = ('status', 'created_at', 'sequence', OrderHasLabelFilter, 'running')
+    list_filter = ('configuration', 'status', 'created_at', 'sequence', OrderHasLabelFilter, 'running')
     actions = ('handle_get_expedition_info', 'handle_get_update_orders', 'handle_send_order_to_integrator')
     search_fields = ('number', 'number_store')
 
