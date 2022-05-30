@@ -45,6 +45,7 @@ class Configuration(models.Model):
     )
     days = models.IntegerField(default=0)
     search_labels = models.BooleanField(default=False)
+    use_invoice_items = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):

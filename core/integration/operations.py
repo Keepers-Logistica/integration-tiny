@@ -348,13 +348,34 @@ class SaveInvoice(BaseOperation):
             id=self.__order.invoice_id
         )
 
+    def save_items(self, order: Order, items: List[OrderItemData]):
+        logger.info(items)
+
+        order.items.all().delete()
+
+        bulk_items = [
+            OrderItems(
+                idseq=idseq,
+                order=order, **item.to_dict()
+            )
+            for idseq, item in enumerate(items, start=1)
+        ]
+        OrderItems.objects.bulk_create(bulk_items)
+
     def save(self, serializer: ResponseSerializer):
         logger.info(f'Save invoice by order {self.__order}')
 
         payload = serializer.invoice
 
+        items = payload.pop('items')
+
         for field, value in payload.items():
             setattr(self.__order, field, value)
+
+        if self.configuration.use_invoice_items:
+            self.save_items(self.__order, items)
+
+            self.__order.products = len(items)
 
         self.__order.save()
 
@@ -416,9 +437,11 @@ class UpdateOrder(BaseOperation):
         for field, value in payload.items():
             setattr(self.__order, field, value)
 
-        self.save_items(self.__order, items)
+        if not self.configuration.use_invoice_items:
+            self.save_items(self.__order, items)
 
-        self.__order.products = len(items)
+            self.__order.products = len(items)
+
         self.__order.update_status(Order.AWAITING_FILES)
 
         try:

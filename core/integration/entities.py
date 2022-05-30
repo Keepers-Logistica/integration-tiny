@@ -166,6 +166,7 @@ class InvoiceData(Base):
 
         self.__invoice_status = data.get('situacao', 1)
         self.__transport = data.get('transport', {})
+        self.__items = data.get('itens', [])
 
     @property
     def invoice_status(self):
@@ -181,6 +182,17 @@ class InvoiceData(Base):
             ).in_cnpj.value
 
         return cnpj
+
+    @property
+    def items(self):
+        items = []
+
+        for item in self.__items:
+            informations_item = item.get('item', {})
+
+            items.append(OrderItemData(informations_item))
+
+        return items
 
 
 class OrderExpeditionInfo(Base):
