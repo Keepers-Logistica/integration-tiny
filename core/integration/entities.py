@@ -165,7 +165,7 @@ class InvoiceData(Base):
         self.invoice = data.get('numero', None)
 
         self.__invoice_status = data.get('situacao', 1)
-        self.__transport = data.get('transport', {})
+        self.__transport = data.get('transportador', {})
         self.__items = data.get('itens', [])
 
     @property
