@@ -445,7 +445,9 @@ class UpdateOrder(BaseOperation):
                 order=self.__order
             ).execute()
         except OperationError as error:
-            logger.warning(f'[Save Invoice - {self.__order}] - {error}')
+            logger.warning(
+                f'[Save Invoice - {self.__order}] - {error}'
+            )
 
     def before_execution(self):
         self.__order.set_running()

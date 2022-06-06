@@ -1,3 +1,5 @@
+from django.db import transaction
+
 from core.integration.operations import *
 from core.models import Configuration
 from core.models import Order
@@ -67,8 +69,10 @@ def task_update_orders():
     orders.update(running=True)
 
     for _id in ids:
-        task_update_order.delay(
-            _id
+        transaction.on_commit(
+            lambda: task_update_order.delay(
+                _id
+            )
         )
 
 
@@ -102,8 +106,10 @@ def task_search_expeditions():
     orders.update(running=True)
 
     for _id in ids:
-        task_search_expedition.delay(
-            _id
+        transaction.on_commit(
+            lambda: task_search_expedition.delay(
+                _id
+            )
         )
 
 
