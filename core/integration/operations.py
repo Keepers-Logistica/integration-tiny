@@ -476,7 +476,8 @@ class GetCancelledOrders(BaseOperation):
         logger.info('Starting the search for canceled orders...')
 
         orders = serializer.orders
-        identifiers = [order.get('identifier') for order in orders]
+        identifiers = [order.get('identifier', None) for order in orders]
+        identifiers = list(filter(None, identifiers))
 
         orders = Order.objects.filter(
             identifier__in=identifiers,
