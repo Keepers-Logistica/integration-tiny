@@ -143,6 +143,11 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(minute='*/5'),
         'args': (-1,)
     },
+    'sync-cancelled-orders': {
+        'task': 'core.tasks.task_sync_cancelled_orders',
+        'schedule': crontab(minute='*/5'),
+        'args': (-1,)
+    },
     'update-orders': {
         'task': 'core.tasks.task_update_orders',
         'schedule': crontab(minute='*/5'),

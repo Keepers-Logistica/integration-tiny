@@ -6,7 +6,7 @@ from core.tasks import *
 
 @admin.register(Configuration)
 class ConfigurationAdmin(admin.ModelAdmin):
-    actions = ('handle_sync_orders', 'handle_send_request_to_integrator')
+    actions = ('handle_sync_orders', 'handle_sync_cancelled_orders')
 
     def handle_sync_orders(self, request, queryset):
         for configuration in queryset:
@@ -15,6 +15,14 @@ class ConfigurationAdmin(admin.ModelAdmin):
             )
 
     handle_sync_orders.short_description = 'Sincronizar pedidos'
+
+    def handle_sync_cancelled_orders(self, request, queryset):
+        for configuration in queryset:
+            task_sync_cancelled_orders.delay(
+                configuration.id
+            )
+
+    handle_sync_cancelled_orders.short_description = 'Sincronizar pedidos cancelados'
 
 
 # Register your models here.

@@ -456,6 +456,43 @@ class UpdateOrder(BaseOperation):
         self.__order.set_running(False)
 
 
+class GetCancelledOrders(BaseOperation):
+    RESOURCE = 'pedidos.pesquisa.php'
+
+    def update_params(self):
+        before = (
+            timezone.now() - timezone.timedelta(days=self.configuration.days)
+        ).strftime('%d/%m/%Y')
+        now = timezone.now().strftime('%d/%m/%Y')
+
+        self.params.update(
+            dataInicialOcorrencia=before,
+            dataFinalOcorrencia=now,
+            situacao='cancelado',
+            sort="DESC"
+        )
+
+    def save(self, serializer: ResponseSerializer):
+        logger.info('Starting the search for canceled orders...')
+
+        orders = serializer.orders
+        identifiers = [order.get('identifier') for order in orders]
+
+        orders = Order.objects.filter(
+            identifier__in=identifiers,
+            configuration=self.configuration,
+        ).exclude(status=Order.CANCELLED)
+
+        if orders:
+            logger.info(
+                f"{orders.count()} Orders canceled of "
+                f"{self.configuration}"
+            )
+            orders.update(status=Order.CANCELLED)
+
+        logger.info(f"End of search for canceled orders")
+
+
 class SaveOrders(BaseOperation):
     RESOURCE = 'pedidos.pesquisa.php'
 
