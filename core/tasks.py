@@ -45,17 +45,10 @@ def task_update_order(order_id):
         order = Order.objects.get(
             id=order_id
         )
-        try:
-            UpdateOrder(
-                order.configuration,
-                order
-            ).execute()
-
-        except OperationError as error:
-            logger.warning(
-                f'[Order {order}] - Update order: {error}'
-            )
-            order.set_running(False)
+        UpdateOrder(
+            order.configuration,
+            order
+        ).execute()
     except Order.DoesNotExist:
         pass
 
