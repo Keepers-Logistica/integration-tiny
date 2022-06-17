@@ -45,10 +45,18 @@ def task_update_order(order_id):
         order = Order.objects.get(
             id=order_id
         )
-        UpdateOrder(
-            order.configuration,
-            order
-        ).execute()
+        try:
+            UpdateOrder(
+                order.configuration,
+                order
+            ).execute()
+        except OperationError as error:
+            logger.warning(
+                f'[Order {order}] - Save labels: {error}'
+            )
+        finally:
+            order.set_running(False)
+
     except Order.DoesNotExist:
         pass
 
@@ -85,6 +93,7 @@ def task_search_expedition(order_id):
                 f'[Order {order}] - Save labels: {error}'
             )
 
+        finally:
             order.set_running(False)
     except Order.DoesNotExist:
         pass

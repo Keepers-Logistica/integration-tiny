@@ -277,14 +277,6 @@ class SaveExpeditionInfo(BaseOperation):
             self.__order
         ).execute()
 
-    def before_execution(self):
-        if not self.__order.running:
-            self.__order.set_running()
-
-    def after_execution(self):
-        if self.__order.running:
-            self.__order.set_running(False)
-
 
 class SaveInvoiceFile(BaseOperation):
     RESOURCE = 'nota.fiscal.obter.xml.php'
@@ -456,12 +448,6 @@ class UpdateOrder(BaseOperation):
             logger.warning(
                 f'[Update Order - {self.__order}] - {error}'
             )
-
-    def before_execution(self):
-        self.__order.set_running()
-
-    def after_execution(self):
-        self.__order.set_running(False)
 
 
 class GetCancelledOrders(BaseOperation):
