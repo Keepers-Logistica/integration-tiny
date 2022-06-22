@@ -4,6 +4,11 @@ from core.filters import OrderHasLabelFilter
 from core.tasks import *
 
 
+@admin.register(Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    pass
+
+
 @admin.register(Configuration)
 class ConfigurationAdmin(admin.ModelAdmin):
     actions = ('handle_sync_orders', 'handle_sync_cancelled_orders')
