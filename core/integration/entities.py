@@ -239,7 +239,13 @@ class ResponseSerializer:
         return OrderExpeditionInfo(self.__expedition).to_dict()
 
     def __serializer_labels(self):
-        return [label.get('link') for label in self.__labels]
+        if not self.__labels:
+            return []
+
+        return [
+            label.get('link')
+            for label in self.__labels
+        ]
 
     @property
     def invoice(self):
