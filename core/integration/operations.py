@@ -638,3 +638,53 @@ class GetOrderInIntegrator:
             self.__order.save(
                 update_fields=['integrator_id']
             )
+
+
+class GetProcessedOrderInIntegrator:
+    def __init__(self, configuration: Configuration):
+        self.__configuration = configuration
+
+    def get_order(self, payload):
+        order_number = payload.get('order_number', None)
+        integrator_id = payload.get('id', None)
+
+        order = Order.objects.get(
+            number=order_number,
+            integrator_id=integrator_id,
+            configuration=self.__configuration
+        )
+
+        return order
+
+    def send_request(self):
+        resource = urljoin(
+            BASE_URL_INTEGRATOR,
+            f'orders?status=14&limit=2000'
+        )
+        headers = {
+            'Authorization': f'Token {self.__configuration.token_integrator}',
+        }
+        response = requests.get(
+            url=resource,
+            headers=headers
+        )
+
+        if response and response.status_code == 200:
+            return response.json()
+
+        return None
+
+    def execute(self):
+        data = self.send_request()
+
+        if data:
+            results = data.get('results', [])
+
+            if not results:
+                return
+
+            for payload in results:
+                order = self.get_order(
+                    payload
+                )
+                order.set_processed()

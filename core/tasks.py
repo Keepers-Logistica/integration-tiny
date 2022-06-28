@@ -116,6 +116,28 @@ def task_search_expeditions():
 
 
 @app.task
+def task_sync_processed_orders(configuration_id):
+    queryset = Configuration.objects.filter(
+        is_active=True
+    ).all()
+    if configuration_id > 0:
+        queryset = queryset.filter(
+            id=configuration_id
+        )
+
+    for configuration in queryset:
+        try:
+            GetProcessedOrderInIntegrator(
+                configuration
+            ).execute()
+
+        except OperationError as error:
+            logger.warning(
+                f'[{configuration}] - Sync orders: {error}'
+            )
+
+
+@app.task
 def task_sync_cancelled_orders(configuration_id):
     queryset = Configuration.objects.filter(
         is_active=True

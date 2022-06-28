@@ -11,7 +11,11 @@ class CustomerAdmin(admin.ModelAdmin):
 
 @admin.register(Configuration)
 class ConfigurationAdmin(admin.ModelAdmin):
-    actions = ('handle_sync_orders', 'handle_sync_cancelled_orders')
+    actions = (
+        'handle_sync_orders',
+        'handle_sync_cancelled_orders',
+        'handle_sync_order_processed'
+    )
 
     def handle_sync_orders(self, request, queryset):
         for configuration in queryset:
@@ -28,6 +32,14 @@ class ConfigurationAdmin(admin.ModelAdmin):
             )
 
     handle_sync_cancelled_orders.short_description = 'Sincronizar pedidos cancelados'
+
+    def handle_sync_order_processed(self, request, queryset):
+        for configuration in queryset:
+            task_sync_processed_orders.delay(
+                configuration.id
+            )
+
+    handle_sync_order_processed.short_description = 'Sincronizar pedidos processados'
 
 
 # Register your models here.
