@@ -659,7 +659,7 @@ class GetProcessedOrderInIntegrator:
     def send_request(self):
         resource = urljoin(
             BASE_URL_INTEGRATOR,
-            f'orders?status=14&limit=2000'
+            f'orders?status__in=14&limit=2000'
         )
         headers = {
             'Authorization': f'Token {self.__configuration.token_integrator}',
@@ -679,6 +679,8 @@ class GetProcessedOrderInIntegrator:
 
         if data:
             results = data.get('results', [])
+
+            print(len(results))
 
             if not results:
                 return
