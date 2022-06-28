@@ -10,7 +10,11 @@ class OrderManager(Manager):
             status=self.model.IMPORTED,
             search_label=True,
             running=False
-        ).exclude(status=self.model.CANCELLED)
+        ).exclude(
+            status=self.model.CANCELLED,
+        ).exclude(
+            processed=True
+        )
 
         return queryset
 
@@ -21,6 +25,10 @@ class OrderManager(Manager):
             xml__in=['', None],
             status=self.model.AWAITING_FILES,
             running=False
-        ).exclude(status=self.model.CANCELLED)
+        ).exclude(
+            status=self.model.CANCELLED
+        ).exclude(
+            processed=True
+        )
 
         return queryset

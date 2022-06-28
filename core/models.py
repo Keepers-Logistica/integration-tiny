@@ -151,6 +151,7 @@ class Order(models.Model):
     )
     search_label = models.BooleanField(default=False)
     running = models.BooleanField(default=False)
+    processed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -185,6 +186,10 @@ class Order(models.Model):
     def set_running(self, running=True):
         self.running = running
         self.save(update_fields=['running'])
+
+    def set_processed(self, processed=True):
+        self.processed = processed
+        self.save(update_fields=['processed'])
 
     def __str__(self):
         return f'{self.number}'
