@@ -21,6 +21,8 @@ class OrderHasLabelFilter(SimpleListFilter):
         if value and int(value) < 0:
             return queryset.filter(
                 label__in=[None, '']
-            )
+            ).exclude(
+                status=self.model.CANCELLED
+            ).exclude(processed=True)
 
         return queryset
