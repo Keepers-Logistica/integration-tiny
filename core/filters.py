@@ -1,6 +1,6 @@
 from django.contrib.admin import SimpleListFilter
 
-from models import Order
+from core.models import Order
 
 
 class OrderHasLabelFilter(SimpleListFilter):
