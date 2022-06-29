@@ -643,6 +643,8 @@ class GetOrderInIntegrator:
 class GetProcessedOrderInIntegrator:
     def __init__(self, configuration: Configuration):
         self.__configuration = configuration
+        self.__page = 1
+        self.__pages = 1
 
     def get_order(self, payload):
         order_number = payload.get('order_number', None)
@@ -659,7 +661,7 @@ class GetProcessedOrderInIntegrator:
     def send_request(self):
         resource = urljoin(
             BASE_URL_INTEGRATOR,
-            f'orders?status__in=14&limit=2000'
+            f'orders?status__in=14&page={self.__page}'
         )
         headers = {
             'Authorization': f'Token {self.__configuration.token_integrator}',
@@ -674,13 +676,12 @@ class GetProcessedOrderInIntegrator:
 
         return None
 
-    def execute(self):
+    def get_orders(self):
         data = self.send_request()
 
         if data:
             results = data.get('results', [])
-
-            print(len(results))
+            self.__pages = data.get('pages', 1)
 
             if not results:
                 return
@@ -690,3 +691,7 @@ class GetProcessedOrderInIntegrator:
                     payload
                 )
                 order.set_processed()
+
+    def execute(self):
+        for self.__page in self.__pages:
+            self.get_orders()
