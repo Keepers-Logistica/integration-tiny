@@ -677,10 +677,14 @@ class GetProcessedOrderInIntegrator:
 
     def process_payload(self, results):
         for payload in results:
-            order = self.get_order(
-                payload
-            )
-            order.set_processed()
+            try:
+                order = self.get_order(
+                    payload
+                )
+                order.set_processed()
+
+            except Order.DoesNotExist:
+                pass
 
     def get_orders(self):
         data = self.send_request()
