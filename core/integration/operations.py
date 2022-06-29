@@ -693,5 +693,5 @@ class GetProcessedOrderInIntegrator:
                 order.set_processed()
 
     def execute(self):
-        for self.__page in self.__pages:
+        for self.__page in range(1, self.__pages):
             self.get_orders()
