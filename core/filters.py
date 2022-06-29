@@ -1,5 +1,7 @@
 from django.contrib.admin import SimpleListFilter
 
+from models import Order
+
 
 class OrderHasLabelFilter(SimpleListFilter):
     title = 'Tem etiqueta ?'  # a label for our filter
@@ -22,7 +24,7 @@ class OrderHasLabelFilter(SimpleListFilter):
             return queryset.filter(
                 label__in=[None, '']
             ).exclude(
-                status=self.model.CANCELLED
+                status=Order.CANCELLED
             ).exclude(processed=True)
 
         return queryset
