@@ -644,7 +644,6 @@ class GetProcessedOrderInIntegrator:
     def __init__(self, configuration: Configuration):
         self.__configuration = configuration
         self.__page = 1
-        self.__pages = 1
 
     def get_order(self, payload):
         order_number = payload.get('order_number', None)
@@ -676,22 +675,32 @@ class GetProcessedOrderInIntegrator:
 
         return None
 
+    def process_payload(self, results):
+        for payload in results:
+            order = self.get_order(
+                payload
+            )
+            order.set_processed()
+
     def get_orders(self):
         data = self.send_request()
 
-        if data:
-            results = data.get('results', [])
-            self.__pages = data.get('pages', 1)
+        if not data:
+            return
+        results = data.get('results', [])
+        pages = data.get('pages', [])
 
-            if not results:
-                return
+        if not results:
+            return
 
-            for payload in results:
-                order = self.get_order(
-                    payload
-                )
-                order.set_processed()
+        self.process_payload(results)
+
+        if self.__page >= pages:
+            return
+
+        self.__page += 1
+
+        self.get_orders()
 
     def execute(self):
-        for self.__page in range(1, self.__pages):
-            self.get_orders()
+        self.get_orders()
