@@ -56,7 +56,8 @@ class OrderAdmin(admin.ModelAdmin):
         'invoice_status',
         'contains_transport',
         'products',
-        'created_at'
+        'created_at',
+        'updated_at'
     )
 
     list_filter = ('configuration', 'status', 'created_at', 'sequence', OrderHasLabelFilter, 'running')
