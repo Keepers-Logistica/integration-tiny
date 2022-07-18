@@ -239,6 +239,9 @@ class SaveLabelOrder(BaseOperation):
     def save(self, serializer: ResponseSerializer):
         logger.info(f'Create xml file by order {self.__order}')
 
+        if not serializer.labels:
+            return
+
         self.save_label(serializer.labels)
 
         SendRequestLabelToIntegrator(
