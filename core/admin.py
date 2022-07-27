@@ -64,6 +64,7 @@ class OrderAdmin(admin.ModelAdmin):
     actions = (
         'handle_get_expedition_info',
         'handle_get_update_orders',
+        'handle_send_billing_to_integrator',
         'handle_send_order_to_integrator',
         'handle_send_label_to_integrator'
     )
@@ -141,6 +142,14 @@ class OrderAdmin(admin.ModelAdmin):
             ).execute()
 
     handle_send_label_to_integrator.short_description = 'Enviar etiqueta'
+
+    def handle_send_billing_to_integrator(self, request, queryset):
+        for order in queryset:
+            SendRequestBillingToIntegrator(
+                order
+            ).execute()
+
+    handle_send_billing_to_integrator.short_description = 'Enviar faturamento'
 
 
 @admin.register(OrderItems)
