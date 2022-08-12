@@ -179,9 +179,15 @@ class Order(models.Model):
             and self.access_key
         )
 
-    def update_status(self, status):
+    def update_status(self, status, save=True):
         self.status = status
-        self.save()
+
+        if not save:
+            return
+
+        self.save(
+            update_fields=['status']
+        )
 
     def set_running(self, running=True):
         self.running = running

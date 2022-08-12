@@ -160,7 +160,12 @@ class SendRequestToIntegrator:
             self.__order.integrator_id = content.get('id', None)
             self.__order.status = Order.IMPORTED
 
-        self.__order.save()
+        self.__order.save(
+            update_fields=[
+                'integrator_id',
+                'status'
+            ]
+        )
 
         SendRequestBillingToIntegrator(
             self.__order
@@ -367,7 +372,9 @@ class SaveInvoice(BaseOperation):
 
             self.__order.products = len(items)
 
-        self.__order.save()
+        self.__order.save(
+            update_fields=['products']
+        )
 
         if self.__order.is_save_xml():
             SaveInvoiceFile(
@@ -432,7 +439,17 @@ class UpdateOrder(BaseOperation):
 
             self.__order.products = len(items)
 
-        self.__order.update_status(Order.AWAITING_FILES)
+        self.__order.update_status(
+            Order.AWAITING_FILES,
+            False
+        )
+
+        self.__order.save(
+            update_fields=[
+                'products',
+                'status'
+            ]
+        )
 
         try:
             SaveInvoice(

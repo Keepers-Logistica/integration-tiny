@@ -55,6 +55,7 @@ class OrderAdmin(admin.ModelAdmin):
         'verbose_invoice',
         'invoice_status',
         'contains_transport',
+        'contains_integrator_id',
         'products',
         'created_at',
         'updated_at'
@@ -92,6 +93,12 @@ class OrderAdmin(admin.ModelAdmin):
 
     contains_label.boolean = True
     contains_label.short_description = 'Etiqueta'
+
+    def contains_integrator_id(self, obj: Order):
+        return bool(obj.integrator_id)
+
+    contains_integrator_id.boolean = True
+    contains_integrator_id.short_description = 'Integrator Id'
 
     def handle_get_expedition_info(self, request, queryset):
         for order in queryset:
