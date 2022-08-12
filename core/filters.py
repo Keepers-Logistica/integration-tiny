@@ -17,7 +17,11 @@ class OrderHasLabelFilter(SimpleListFilter):
     def queryset(self, request, queryset):
         value = self.value()
         if value and int(value) > 0:
-            return queryset.exclude(
+            return queryset.select_related(
+                'configuration'
+            ).filter(
+                configuration__search_labels=True
+            ).exclude(
                 label__in=[None, '']
             )
         if value and int(value) < 0:
