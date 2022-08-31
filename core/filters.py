@@ -18,15 +18,16 @@ class OrderHasLabelFilter(SimpleListFilter):
         value = self.value()
         queryset = queryset.select_related(
             'configuration'
-        ).filter(
-            configuration__search_labels=True
         )
         if value and int(value) > 0:
-            return queryset.exclude(
+            return queryset.filter(
+                configuration__search_labels=True
+            ).exclude(
                 label__in=[None, '']
             )
         if value and int(value) < 0:
             return queryset.filter(
+                configuration__search_labels=True,
                 label__in=[None, '']
             ).exclude(
                 status=Order.CANCELLED
