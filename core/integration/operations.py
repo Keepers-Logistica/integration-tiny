@@ -219,11 +219,12 @@ class SaveLabelOrder(BaseOperation):
             idExpedicao=self.__order.expedition_id
         )
 
-    def generate_file(self, content):
+    def generate_file(self, content, filename):
+        _, extension = os.path.splitext(filename)
         self.__order.label.save(
             os.path.join(
                 self.__order.configuration.name,
-                f'{self.__order.number}.pdf'
+                f'{self.__order.number}{extension}'
             ),
             ContentFile(content)
         )
@@ -237,9 +238,10 @@ class SaveLabelOrder(BaseOperation):
                     for filename in zipfile.namelist():
                         self.generate_file(
                             zipfile.read(filename).decode(),
+                            filename
                         )
             except BadZipfile:
-                self.generate_file(content)
+                self.generate_file(content, filename)
 
     def save(self, serializer: ResponseSerializer):
         logger.info(f'Create xml file by order {self.__order}')
