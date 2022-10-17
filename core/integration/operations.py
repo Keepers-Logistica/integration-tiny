@@ -221,6 +221,8 @@ class SaveLabelOrder(BaseOperation):
 
     def generate_file(self, content, filename):
         _, extension = os.path.splitext(filename)
+
+        extension = (extension, '.zpl')[extension == '.txt']
         self.__order.label.save(
             os.path.join(
                 self.__order.configuration.name,
