@@ -156,6 +156,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'core.tasks.task_search_expeditions',
         'schedule': crontab(minute='*/5'),
     },
+    'send-labels': {
+        'task': 'core.tasks.task_send_labels',
+        'schedule': crontab(minute='*/5'),
+    }
 }
 
 AUTHENTICATION_BACKENDS = [

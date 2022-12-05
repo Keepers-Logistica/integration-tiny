@@ -179,3 +179,22 @@ def task_sync_orders(configuration_id):
             logger.warning(
                 f'[{configuration}] - Sync orders: {error}'
             )
+
+
+@app.task
+def task_send_labels():
+    queryset = Order.objects.filter(
+        search_label=True,
+        sent_label=False,
+    ).exclude(
+        processed=True
+    ).exclude(
+        status=Order.CANCELLED
+    ).exclude(
+        label__in=['', None],
+    )
+
+    for order in queryset:
+        SendRequestLabelToIntegrator(
+            order
+        ).execute()

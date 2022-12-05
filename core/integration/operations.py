@@ -204,6 +204,7 @@ class SendRequestLabelToIntegrator:
             return
 
         self.send_request()
+        self.__order.set_sent_label()
 
 
 class SaveLabelOrder(BaseOperation):
