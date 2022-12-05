@@ -183,16 +183,7 @@ def task_sync_orders(configuration_id):
 
 @app.task
 def task_send_labels():
-    queryset = Order.objects.filter(
-        search_label=True,
-        sent_label=False
-    ).exclude(
-        processed=True
-    ).exclude(
-        status=Order.CANCELLED
-    ).exclude(
-        label__in=['', None]
-    )
+    queryset = Order.objects.pending_send_labels()
 
     for order in queryset:
         SendRequestLabelToIntegrator(

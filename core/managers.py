@@ -32,3 +32,19 @@ class OrderManager(Manager):
         )
 
         return queryset
+
+    def pending_send_labels(self):
+        queryset = self.get_queryset()
+
+        queryset = queryset.filter(
+            search_label=True,
+            sent_label=False
+        ).exclude(
+            processed=True
+        ).exclude(
+            status=Order.CANCELLED
+        ).exclude(
+            label__in=['', None]
+        )
+
+        return queryset
