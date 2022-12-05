@@ -42,7 +42,7 @@ class OrderManager(Manager):
         ).exclude(
             processed=True
         ).exclude(
-            status=Order.CANCELLED
+            status=self.model.CANCELLED
         ).exclude(
             label__in=['', None]
         )
