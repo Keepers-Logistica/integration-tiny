@@ -67,7 +67,8 @@ class OrderAdmin(admin.ModelAdmin):
         'handle_get_update_orders',
         'handle_send_billing_to_integrator',
         'handle_send_order_to_integrator',
-        'handle_send_label_to_integrator'
+        'handle_send_label_to_integrator',
+        'handle_send_cancelation_to_integrator'
     )
     search_fields = ('number', 'number_store')
 

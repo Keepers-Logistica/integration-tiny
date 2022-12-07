@@ -508,6 +508,12 @@ class GetCancelledOrders(BaseOperation):
                 f"{orders.count()} Orders canceled of "
                 f"{self.configuration}"
             )
+
+            for order in orders:
+                SendRequestCancelationToIntegrator(
+                    order
+                ).execute()
+
             orders.update(status=Order.CANCELLED)
 
         logger.info(f"End of search for canceled orders")
@@ -621,6 +627,9 @@ class SendRequestCancelationToIntegrator:
 
     def execute(self):
         if not self.__order.integrator_id:
+            return
+
+        if self.__order.status != Order.CANCELLED:
             return
 
         self.send_request()
