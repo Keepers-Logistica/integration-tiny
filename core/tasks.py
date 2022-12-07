@@ -1,3 +1,4 @@
+from celery.signals import beat_init
 from django.db import transaction
 
 from core.integration.operations import *
@@ -189,3 +190,10 @@ def task_send_labels():
         SendRequestLabelToIntegrator(
             order
         ).execute()
+
+
+@beat_init.connect
+def task_callback_start_beat(**kwargs):
+    Order.objects.filter(
+        running=True
+    ).update(running=False)
