@@ -2,7 +2,7 @@ import json
 import os
 from io import BytesIO
 from typing import List
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 from urllib.request import urlopen
 from zipfile import BadZipfile, ZipFile
 
@@ -234,6 +234,12 @@ class SaveLabelOrder(BaseOperation):
 
     def save_label(self, labels):
         for label in labels:
+            path = urlparse(label).path
+
+            filename, extension = os.path.splitext(path)
+            if not extension:
+                continue
+
             resp = urlopen(label)
             content = resp.read()
             try:
@@ -244,6 +250,7 @@ class SaveLabelOrder(BaseOperation):
                             filename
                         )
             except BadZipfile:
+                filename = f'{self.__order.number}{extension}'
                 self.generate_file(content, filename)
 
     def save(self, serializer: ResponseSerializer):
