@@ -5,6 +5,7 @@ from django.db import models
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
+from core.fields import CustomCharField
 from core.managers import OrderManager
 from integration_tiny import settings
 
@@ -71,7 +72,7 @@ class Customer(models.Model):
     postal_code = models.CharField(max_length=9)
 
     cnpj_cpf = models.CharField(max_length=20)
-    number = models.CharField(max_length=10, null=True, blank=True)
+    number = CustomCharField(max_length=10, null=True, blank=True)
 
     class Meta:
         verbose_name = _('Customer')
