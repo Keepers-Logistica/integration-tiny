@@ -60,14 +60,14 @@ class Configuration(models.Model):
 class Customer(models.Model):
     name = models.CharField(max_length=60, null=True, blank=True)
     fantasy_name = models.CharField(max_length=60, null=True, blank=True)
-    address = models.CharField(max_length=80)
+    address = CustomCharField(max_length=80)
 
     complement = models.CharField(max_length=100, null=True, blank=True)
-    neighbourhood = models.CharField(max_length=50)
+    neighbourhood = CustomCharField(max_length=50)
 
-    city = models.CharField(max_length=40)
+    city = CustomCharField(max_length=40)
 
-    state = models.CharField(max_length=2)
+    state = CustomCharField(max_length=2)
 
     postal_code = models.CharField(max_length=9)
 
