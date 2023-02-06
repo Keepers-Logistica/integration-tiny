@@ -156,10 +156,14 @@ class SendRequestToIntegrator:
     def execute(self):
         content = self.send_request_by_integrator()
 
-        if content:
-            self.__order.integrator_id = content.get('id', None)
-            self.__order.status = Order.IMPORTED
+        if not content:
+            return
 
+        self.__order.integrator_id = content.get('id', None)
+        if not self.__order.integrator_id:
+            return
+
+        self.__order.status = Order.IMPORTED
         self.__order.save(
             update_fields=[
                 'integrator_id',
