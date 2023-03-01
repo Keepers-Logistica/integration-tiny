@@ -640,9 +640,6 @@ class SendRequestCancelationToIntegrator:
         if not self.__order.integrator_id:
             return
 
-        if self.__order.status != Order.CANCELLED:
-            return
-
         self.send_request()
 
 
