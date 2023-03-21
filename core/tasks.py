@@ -192,6 +192,19 @@ def task_send_labels():
         ).execute()
 
 
+@app.task
+def task_send_orders_awaiting_integration():
+    queryset = Order.objects.filter(
+        status=Order.AWAITING_INTEGRATION,
+        running=False
+    )
+
+    for order in queryset:
+        SendRequestToIntegrator(
+            order
+        ).execute()
+
+
 @beat_init.connect
 def task_callback_start_beat(**kwargs):
     Order.objects.filter(

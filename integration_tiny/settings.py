@@ -159,6 +159,10 @@ CELERY_BEAT_SCHEDULE = {
     'send-labels': {
         'task': 'core.tasks.task_send_labels',
         'schedule': crontab(minute='*/5'),
+    },
+    'send-orders-awaiting-integration': {
+        'task': 'core.tasks.task_send_orders_awaiting_integration',
+        'schedule': crontab(minute='*/5'),
     }
 }
 
