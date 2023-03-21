@@ -58,8 +58,8 @@ class Configuration(models.Model):
 
 
 class Customer(models.Model):
-    name = models.CharField(max_length=60, null=True, blank=True)
-    fantasy_name = models.CharField(max_length=60, null=True, blank=True)
+    name = CustomCharField(max_length=60, null=True, blank=True)
+    fantasy_name = CustomCharField(max_length=60, null=True, blank=True)
     address = CustomCharField(max_length=80)
 
     complement = models.CharField(max_length=100, null=True, blank=True)
