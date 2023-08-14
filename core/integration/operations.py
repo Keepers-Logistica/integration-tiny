@@ -11,21 +11,12 @@ import xmltodict
 from django.core.files.base import ContentFile
 from django.forms import model_to_dict
 from django.utils import timezone
+from requests import Response
 
 from core import logger
 from core.integration.entities import OrderItemData, ResponseSerializer
 from core.models import Configuration, Customer, Order, OrderItems
 from integration_tiny.settings import (BASE_URL_INTEGRATOR, BASE_URL_TINY)
-
-
-def remove_ascii_character(value):
-    if isinstance(value, bytes):
-        try:
-            value = value.decode('utf-8')
-        except UnicodeDecodeError:
-            value = value.decode('ISO-8859-1')
-
-    return value
 
 
 def request(resource, params):
@@ -57,7 +48,8 @@ class BaseOperation(object):
 
         self.update_params()
 
-    def serializer(self, response) -> ResponseSerializer:
+    @staticmethod
+    def serializer(response) -> ResponseSerializer:
         serializer = ResponseSerializer(response)
 
         if not serializer.has_error:
@@ -68,7 +60,7 @@ class BaseOperation(object):
     def update_params(self):
         pass
 
-    def request(self) -> dict:
+    def request(self) -> Response:
         response = requests.get(
             urljoin(BASE_URL_TINY, self.resource),
             params=self.params
@@ -98,6 +90,45 @@ class BaseOperation(object):
         self.save(serializer)
 
         self.after_execution()
+
+
+class GetOrderInIntegrator:
+    def __init__(self, order: Order):
+        self.__order = order
+        self.__configuration = order.configuration
+
+    def send_request(self):
+        resource = urljoin(
+            BASE_URL_INTEGRATOR,
+            f'orders?order_number={self.__order.number}'
+        )
+        headers = {
+            'Authorization': f'Token {self.__configuration.token_integrator}',
+        }
+        response = requests.get(
+            url=resource,
+            headers=headers
+        )
+
+        if response and response.status_code == 200:
+            return response.json()
+
+        return None
+
+    def execute(self):
+        data = self.send_request()
+
+        if data:
+            results = data.get('results', [])
+
+            if not results:
+                self.__order.update_status(Order.CANCELLED)
+                return
+
+            self.__order.integrator_id = results[0]['id']
+            self.__order.save(
+                update_fields=['integrator_id']
+            )
 
 
 class SendRequestToIntegrator:
@@ -151,15 +182,22 @@ class SendRequestToIntegrator:
             data=self.payload
         )
 
-        return response.json()
+        return response
 
     def execute(self):
-        content = self.send_request_by_integrator()
+        response = self.send_request_by_integrator()
 
-        if not content:
+        content = response.json()
+        if response.status_code != 200:
+            if 'order_number' in content:
+                GetOrderInIntegrator(
+                    self.__order
+                ).execute()
             return
 
-        self.__order.integrator_id = content.get('id', None)
+        self.__order.integrator_id = content.get(
+            'id', None
+        )
         if not self.__order.integrator_id:
             return
 
@@ -655,45 +693,6 @@ class SendRequestCancelationToIntegrator:
             return
 
         self.send_request()
-
-
-class GetOrderInIntegrator:
-    def __init__(self, order: Order):
-        self.__order = order
-        self.__configuration = order.configuration
-
-    def send_request(self):
-        resource = urljoin(
-            BASE_URL_INTEGRATOR,
-            f'orders?order_number={self.__order.number}'
-        )
-        headers = {
-            'Authorization': f'Token {self.__configuration.token_integrator}',
-        }
-        response = requests.get(
-            url=resource,
-            headers=headers
-        )
-
-        if response and response.status_code == 200:
-            return response.json()
-
-        return None
-
-    def execute(self):
-        data = self.send_request()
-
-        if data:
-            results = data.get('results', [])
-
-            if not results:
-                self.__order.update_status(Order.CANCELLED)
-                return
-
-            self.__order.integrator_id = results[0]['id']
-            self.__order.save(
-                update_fields=['integrator_id']
-            )
 
 
 class GetProcessedOrderInIntegrator:
