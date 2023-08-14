@@ -491,7 +491,7 @@ class GetCancelledOrders(BaseOperation):
 
     def update_params(self):
         before = (
-            timezone.now() - timezone.timedelta(days=self.configuration.days)
+                timezone.now() - timezone.timedelta(days=self.configuration.days)
         ).strftime('%d/%m/%Y')
         now = timezone.now().strftime('%d/%m/%Y')
 
@@ -535,7 +535,7 @@ class SaveOrders(BaseOperation):
 
     def update_params(self):
         before = (
-            timezone.now() - timezone.timedelta(days=self.configuration.days)
+                timezone.now() - timezone.timedelta(days=self.configuration.days)
         ).strftime('%d/%m/%Y')
         now = timezone.now().strftime('%d/%m/%Y')
 
@@ -546,7 +546,8 @@ class SaveOrders(BaseOperation):
         )
         if self.configuration.status:
             self.params.update(
-                situacao=self.configuration.status
+                situacao=self.configuration.status,
+                pagina=1
             )
 
     def save(self, serializer: ResponseSerializer):
@@ -568,6 +569,15 @@ class SaveOrders(BaseOperation):
                 configuration=self.configuration,
                 defaults=informations_order
             )
+
+        page_now = self.params.get('pagina', 1)
+
+        if page_now < serializer.pages:
+            self.params.update(
+                situacao=self.configuration.status,
+                pagina=page_now + 1
+            )
+            self.execute()
 
         logger.info(f"Sync finished with {len(orders)} orders saved")
 

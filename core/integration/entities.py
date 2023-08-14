@@ -208,6 +208,7 @@ class ResponseSerializer:
             self.data = response.json()
             self.__root = self.data.get('retorno', {})
             self.__orders = self.__root.get('pedidos', [])
+            self.__pages = self.__root.get('numero_paginas', 1)
             self.__order = self.__root.get('pedido', {})
             self.__invoice = self.__root.get('nota_fiscal', {})
             self.__errors = self.__root.get('erros', None)
@@ -298,3 +299,7 @@ class ResponseSerializer:
             'codigo_erro',
             None
         )
+
+    @property
+    def pages(self):
+        return self.__pages
