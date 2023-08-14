@@ -432,9 +432,7 @@ class SaveInvoice(BaseOperation):
 
             self.__order.products = len(items)
 
-        self.__order.save(
-            update_fields=['products']
-        )
+        self.__order.save()
 
         if self.__order.is_save_xml():
             SaveInvoiceFile(
