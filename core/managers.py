@@ -24,7 +24,8 @@ class OrderManager(Manager):
         queryset = queryset.filter(
             xml__in=['', None],
             status=self.model.AWAITING_FILES,
-            running=False
+            running=False,
+            configuration__is_active=True
         ).exclude(
             status=self.model.CANCELLED
         ).exclude(
