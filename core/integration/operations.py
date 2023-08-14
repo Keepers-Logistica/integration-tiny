@@ -251,6 +251,9 @@ class SendRequestLabelToIntegrator:
         if not self.__order.integrator_id:
             return
 
+        if not self.__order.label:
+            return
+
         self.send_request()
         self.__order.set_sent_label()
 
