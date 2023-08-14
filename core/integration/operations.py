@@ -573,11 +573,15 @@ class SaveOrders(BaseOperation):
         page_now = self.params.get('pagina', 1)
 
         if page_now < serializer.pages:
+            page_next = page_now + 1
             self.params.update(
                 situacao=self.configuration.status,
-                pagina=page_now + 1
+                pagina=page_next
             )
             self.execute()
+            logger.info(
+                f"Sync order in pagination {page_next} of {serializer.pages}"
+            )
 
         logger.info(f"Sync finished with {len(orders)} orders saved")
 
