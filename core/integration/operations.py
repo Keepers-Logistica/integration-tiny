@@ -184,11 +184,23 @@ class SendRequestToIntegrator:
 
         return response
 
+    def update_status(self):
+        self.__order.status = Order.IMPORTED
+        self.__order.save(
+            update_fields=[
+                'integrator_id',
+                'status'
+            ]
+        )
+
     def execute(self):
+        if self.__order.integrator_id:
+            self.update_status()
+
         response = self.send_request_by_integrator()
 
         content = response.json()
-        if response.status_code != 200:
+        if response.status_code != 201:
             if 'order_number' in content:
                 GetOrderInIntegrator(
                     self.__order
@@ -201,13 +213,7 @@ class SendRequestToIntegrator:
         if not self.__order.integrator_id:
             return
 
-        self.__order.status = Order.IMPORTED
-        self.__order.save(
-            update_fields=[
-                'integrator_id',
-                'status'
-            ]
-        )
+        self.update_status()
 
         SendRequestBillingToIntegrator(
             self.__order
