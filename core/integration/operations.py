@@ -504,12 +504,7 @@ class UpdateOrder(BaseOperation):
             False
         )
 
-        self.__order.save(
-            update_fields=[
-                'products',
-                'status'
-            ]
-        )
+        self.__order.save()
 
         try:
             SaveInvoice(
