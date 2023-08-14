@@ -9,7 +9,8 @@ class OrderManager(Manager):
             label__in=['', None],
             status=self.model.IMPORTED,
             search_label=True,
-            running=False
+            running=False,
+            configuration__is_active=True
         ).exclude(
             status=self.model.CANCELLED,
         ).exclude(
@@ -39,7 +40,8 @@ class OrderManager(Manager):
 
         queryset = queryset.filter(
             search_label=True,
-            sent_label=False
+            sent_label=False,
+            configuration__is_active=True
         ).exclude(
             processed=True
         ).exclude(
