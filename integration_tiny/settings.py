@@ -145,7 +145,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'sync-cancelled-orders': {
         'task': 'core.tasks.task_sync_cancelled_orders',
-        'schedule': crontab(minute='*/5'),
+        'schedule': crontab(minute='*/10'),
         'args': (-1,)
     },
     'update-orders': {
@@ -154,11 +154,11 @@ CELERY_BEAT_SCHEDULE = {
     },
     'search-expeditions': {
         'task': 'core.tasks.task_search_expeditions',
-        'schedule': crontab(minute='*/5'),
+        'schedule': crontab(minute='*/10'),
     },
     'send-labels': {
         'task': 'core.tasks.task_send_labels',
-        'schedule': crontab(minute='*/5'),
+        'schedule': crontab(minute='*/10'),
     },
     'send-orders-awaiting-integration': {
         'task': 'core.tasks.task_send_orders_awaiting_integration',
