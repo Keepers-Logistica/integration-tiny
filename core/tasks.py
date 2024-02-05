@@ -29,7 +29,7 @@ def task_send_cancelation_to_integrador(order_id):
     ).execute()
 
 
-@app.task(rate_limit='4/m')
+@app.task(rate_limit='1/s')
 def task_send_order_to_integrador(order_id):
     order = Order.objects.get(
         id=order_id
@@ -40,7 +40,7 @@ def task_send_order_to_integrador(order_id):
     ).execute()
 
 
-@app.task(rate_limit='4/m')
+@app.task(rate_limit='1/s')
 def task_update_order(order_id):
     try:
         order = Order.objects.get(
@@ -62,7 +62,7 @@ def task_update_order(order_id):
         pass
 
 
-@app.task(rate_limit='1/s')
+@app.task(rate_limit='10/m')
 def task_update_orders():
     orders = Order.objects.search_update_orders()
     ids = list(
@@ -78,7 +78,7 @@ def task_update_orders():
         )
 
 
-@app.task
+@app.task(rate_limit='10/m')
 def task_search_expedition(order_id):
     try:
         order = Order.objects.get(
