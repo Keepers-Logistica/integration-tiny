@@ -154,7 +154,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'search-expeditions': {
         'task': 'core.tasks.task_search_expeditions',
-        'schedule': crontab(minute='*/20'),
+        'schedule': crontab(minute='*/10'),
     },
     'send-labels': {
         'task': 'core.tasks.task_send_labels',
