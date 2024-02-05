@@ -717,7 +717,7 @@ class GetProcessedOrderInIntegrator:
     def send_request(self):
         resource = urljoin(
             BASE_URL_INTEGRATOR,
-            f'orders?status__in=14&page={self.__page}'
+            f'orders?status__in=14&page={self.__page}&days=7'
         )
         headers = {
             'Authorization': f'Token {self.__configuration.token_integrator}',
